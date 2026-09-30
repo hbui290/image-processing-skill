@@ -16,6 +16,8 @@ Count **image-editing capabilities**, not app names. A viewer is required for re
 
 For web delivery, also check the real page in a browser and run the project's build when source or assets changed. These are delivery checks, not extra image-editing capabilities. `cwebp` is optional when the raster editor already exports the required WebP. Face restorers, background removers, and inpainting packages are conditional alternatives, not a default install set.
 
+For multiple review rounds, [the optional reviewer adapter](reviewer-adapter.md) can validate a structured visual report and produce a bounded decision. It needs Python 3, Pillow, and jsonschema only when selected. Its Codex vision path additionally needs an authenticated CLI, an available image-input model, and account usage. These are **review** dependencies, not image-editing capabilities, and no part is installed automatically.
+
 **Recorded Jadebound example:** the historical hero repair used three principal restoration tools across its stages: ChatGPT ImageGen for replacement crop candidates, ImageMagick for crops/masks/composites/export, and Real-ESRGAN for an early resolution pass. `cwebp` encoded early WebP candidates; `sips` measured dimensions on macOS; image viewing and browser/Vite checks covered delivery. Grounded SAM 2 was studied later as an optional mask-proposal tool; it was not used to produce that hero. Another task may need fewer or different tools.
 
 ## Tool sources

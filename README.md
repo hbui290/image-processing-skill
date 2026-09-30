@@ -2,7 +2,7 @@
 
 **Turn imperfect image assets into reviewable, production-ready work—without losing the details that matter.**
 
-![Version](https://img.shields.io/badge/version-v1.2.0-0B6E75) ![Format](https://img.shields.io/badge/format-Codex%20Plugin%20%2B%20Agent%20Skill-2D4059)
+![Version](https://img.shields.io/badge/version-v1.3.0-0B6E75) ![Format](https://img.shields.io/badge/format-Codex%20Plugin%20%2B%20Agent%20Skill-2D4059)
 
 AI-generated images can look convincing at a glance while hiding changed faces, bent structures, duplicated objects, or soft detail. This repository now provides a modular Codex plugin for focused image tasks and retains the original standalone skill for existing installations. Neither package includes an image model.
 
@@ -22,11 +22,13 @@ The [plugin manifest](plugins/image-processing/.codex-plugin/plugin.json) packag
 After this release is available on GitHub, register the repository marketplace and install the package:
 
 ```bash
-codex plugin marketplace add hbui290/image-processing-skill --ref v1.2.0
+codex plugin marketplace add hbui290/image-processing-skill --ref v1.3.0
 codex plugin add image-processing@image-processing
 ```
 
 Start a new Codex chat after installation so its four skills are discovered. The [marketplace entry](.agents/plugins/marketplace.json) points to the self-contained plugin folder. Installing the package does not install an image model, ImageMagick, Real-ESRGAN, or Grounded SAM 2; check the task-specific capabilities in [tool readiness](plugins/image-processing/references/tool-readiness.md). No marketplace or account configuration changes occur merely by cloning this repository.
+
+The [optional structured reviewer](plugins/image-processing/references/reviewer-adapter.md) brings Image Loop's bounded decision script into `image-verify`. It checks decoded file properties and complete criterion coverage, then records an accept, repair, or stop decision. A supplied visual report avoids a model call; the independent Codex reviewer path needs an image-capable account, Python packages, and account usage. Both paths leave image editing to the host. The [upstream MIT license and adaptation notes](plugins/image-processing/third_party/image-loop/NOTICE.md) travel with the plugin.
 
 ## What it helps with
 
@@ -66,9 +68,11 @@ Other conditional options documented in the references: [LaMa](https://github.co
 
 ## Related work
 
-The plugin's methods draw on [Image Loop](https://github.com/codejunkie99/image-loop/blob/main/skills/image-loop/SKILL.md) for bounded checks, [Image Edit Map](https://github.com/codejunkie99/image-loop/blob/main/skills/image-edit-map/SKILL.md) for addressable objects, [Image Reconstruction](https://github.com/codejunkie99/image-loop/blob/main/skills/image-reconstruction/SKILL.md) for separating source evidence from edit decisions, [Visual Design Kit](https://github.com/newmindsgroup/visual-design-kit/blob/main/plugins/visual-design-studio/library/templates/media-quality-rubric.md) for reject/hold decisions, and [BuilderIO Logo Composite](https://github.com/BuilderIO/agent-native/blob/main/templates/assets/.agents/skills/logo-composite/SKILL.md) for exact brand overlays. These are credited research sources, not bundled dependencies. The final acceptance mask and protected-pixel comparison remain part of this package's workflow.
+The plugin's methods draw on [Image Loop](https://github.com/codejunkie99/image-loop/blob/main/skills/image-loop/SKILL.md) for bounded checks, [Image Edit Map](https://github.com/codejunkie99/image-loop/blob/main/skills/image-edit-map/SKILL.md) for addressable objects, [Image Reconstruction](https://github.com/codejunkie99/image-loop/blob/main/skills/image-reconstruction/SKILL.md) for separating source evidence from edit decisions, [Visual Design Kit](https://github.com/newmindsgroup/visual-design-kit/blob/main/plugins/visual-design-studio/library/templates/media-quality-rubric.md) for reject/hold decisions, and [BuilderIO Logo Composite](https://github.com/BuilderIO/agent-native/blob/main/templates/assets/.agents/skills/logo-composite/SKILL.md) for exact brand overlays. Only the credited Image Loop reviewer files are bundled; the other projects are research sources, not runtime dependencies. The final acceptance mask and protected-pixel comparison remain part of this package's workflow.
 
 ## Release
+
+**v1.3.0** — adapts Image Loop's reviewer/controller as an optional bundled script, adds a supplied-report route that does not call a model, and tightens stable object mapping. The four skills remain separate; the v1.1 standalone path stays available. No model or Python package is installed by the plugin.
 
 **v1.2.0** — adds a modular Codex plugin package with four focused skills and self-contained references. The v1.1 standalone skill stays available for existing agents. No model, external account, or heavyweight segmentation dependency was added.
 
