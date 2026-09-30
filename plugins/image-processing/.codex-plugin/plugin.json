@@ -1,7 +1,7 @@
 {
   "name": "image-processing",
-  "version": "1.3.0",
-  "description": "Focused image inspection, creation, local repair, and verification skills with an optional structured reviewer.",
+  "version": "1.4.0",
+  "description": "Focused image inspection, creation, local repair, and verification skills with an optional source-pixel candidate audit.",
   "author": {
     "name": "hbui290",
     "url": "https://github.com/hbui290"
