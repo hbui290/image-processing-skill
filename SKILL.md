@@ -30,7 +30,7 @@ Inspect the source at native pixels **and** the rendered result at the target si
 | --- | --- |
 | Wrong crop, contrast, or layout | Correct framing or presentation; preserve the image pixels if they are sound. |
 | Compression blocks, noise, mild softness | Try measured denoise, deblock, or sharpening; compare fine details before accepting. |
-| Too few pixels but recognizable detail | Try super-resolution suited to the image medium; compare at final size and reject oversmoothing or invented facial or product details. |
+| Too few pixels, or a large but visibly soft source | Test a suitable super-resolution model on a representative crop. Resize every candidate back to the same delivery size before comparing; reject changes that only look sharper at 4× zoom, oversmooth line art, or invent details. |
 | Missing eyes, broken geometry, fused objects, extra limbs, inconsistent texture | Use a small local edit, manual retouch, or compositing with an approved reference. Upscaling alone cannot solve missing semantics. |
 | Damaged alpha edge or unwanted background | Repair the matte or background, then inspect the edge against light and dark surfaces. |
 | Composition fundamentally wrong | Recompose or regenerate only when that larger change is within the user's request. |
@@ -46,6 +46,7 @@ When a target is ambiguous among repeated objects, make a numbered review copy a
 - Supply the relevant crop and approved references, identifying what each controls. Specify the exact change and protected subjects, count, pose, product markings, typography, perspective, and layout. Composite approved logos or exact text from their source art.
 - Prefer local repair when the composition is sound. Branch from the approved source rather than feeding each generated output into the next edit. A prompt alone cannot protect pixels outside the requested change.
 - Use a crop with context for lighting and geometry, then accept only reviewed pixels through a final mask. Keep the model's input mask separate from the final acceptance mask; check polarity, full object coverage, neighboring subjects, alignment, feathered edges, and seams.
+- When only an object's interior needs rebuilding, use nested masks: an outer acceptance boundary and inner protection for silhouettes, line work, logos, or other exact details. A protected exterior alone does not preserve details inside the edited object. Inspect both the protected islands and newly accepted pixels for doubled edges.
 - Treat novel details as proposed art, not recovered facts. If reference material cannot establish an identity-critical feature, report the uncertainty or request a better reference instead of inventing a canonical answer.
 
 Read [repair-and-composite.md](references/repair-and-composite.md) when a task needs object IDs, tiny-object tiles, prompt structure, crop geometry, feathered masks, or a command example. The reference is a method, not a fixed set of coordinates or model settings.

@@ -2,7 +2,7 @@
 
 **Turn imperfect image assets into reviewable, production-ready work—without losing the details that matter.**
 
-![Version](https://img.shields.io/badge/version-v1.4.0-0B6E75) ![Format](https://img.shields.io/badge/format-Codex%20Plugin%20%2B%20Agent%20Skill-2D4059)
+![Version](https://img.shields.io/badge/version-v1.4.1-0B6E75) ![Format](https://img.shields.io/badge/format-Codex%20Plugin%20%2B%20Agent%20Skill-2D4059)
 
 AI-generated images can look convincing at a glance while hiding changed faces, bent structures, duplicated objects, or soft detail. This repository now provides a modular Codex plugin for focused image tasks and retains the original standalone skill for existing installations. Neither package includes an image model.
 
@@ -22,7 +22,7 @@ The [plugin manifest](plugins/image-processing/.codex-plugin/plugin.json) packag
 After this release is available on GitHub, register the repository marketplace and install the package:
 
 ```bash
-codex plugin marketplace add hbui290/image-processing-skill --ref v1.4.0
+codex plugin marketplace add hbui290/image-processing-skill --ref v1.4.1
 codex plugin add image-processing@image-processing
 ```
 
@@ -71,6 +71,8 @@ Other conditional options documented in the references: [LaMa](https://github.co
 The plugin's methods draw on [Image Loop](https://github.com/codejunkie99/image-loop/blob/main/skills/image-loop/SKILL.md) for bounded checks, [Image Edit Map](https://github.com/codejunkie99/image-loop/blob/main/skills/image-edit-map/SKILL.md) for addressable objects, [Image Reconstruction](https://github.com/codejunkie99/image-loop/blob/main/skills/image-reconstruction/SKILL.md) for separating source evidence from edit decisions, [Visual Design Kit](https://github.com/newmindsgroup/visual-design-kit/blob/main/plugins/visual-design-studio/library/templates/media-quality-rubric.md) for reject/hold decisions, and [BuilderIO Logo Composite](https://github.com/BuilderIO/agent-native/blob/main/templates/assets/.agents/skills/logo-composite/SKILL.md) for exact brand overlays. These are credited research sources, not runtime dependencies. The candidate-audit script and its source-pixel mask checks are this package's implementation.
 
 ## Release
+
+**v1.4.1** — adds a same-size super-resolution comparison for large but soft sources and nested masks that preserve exact details inside a repaired object. The readiness guide now distinguishes installed tools from models that were actually verified and run.
 
 **v1.4.0** — replaces the copied Image Loop reviewer with a purpose-built candidate audit for local repair: object IDs, source-pixel boxes, decoded-pixel checks outside the final mask, full review coverage, and bounded decisions. Requires only optional Pillow; no nested Codex run or model use. Image Loop remains credited as research inspiration.
 

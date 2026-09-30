@@ -1,6 +1,6 @@
 {
   "name": "image-processing",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Focused image inspection, creation, local repair, and verification skills with an optional source-pixel candidate audit.",
   "author": {
     "name": "hbui290",
