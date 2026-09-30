@@ -1,0 +1,21 @@
+{
+  "name": "image-processing",
+  "version": "1.2.0",
+  "description": "Focused image inspection, creation, local repair, and verification skills.",
+  "author": {
+    "name": "hbui290",
+    "url": "https://github.com/hbui290"
+  },
+  "repository": "https://github.com/hbui290/image-processing-skill",
+  "homepage": "https://github.com/hbui290/image-processing-skill",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Image Processing",
+    "shortDescription": "Inspect, repair, and verify images with source control.",
+    "longDescription": "Four focused skills for image inspection, reference-guided creation, local repair, and independent verification. Editing tools remain optional and task-specific.",
+    "developerName": "hbui290",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Inspect this image, repair the named defects, and verify protected details."
+  }
+}

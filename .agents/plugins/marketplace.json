@@ -1,0 +1,20 @@
+{
+  "name": "image-processing",
+  "interface": {
+    "displayName": "Image Processing"
+  },
+  "plugins": [
+    {
+      "name": "image-processing",
+      "source": {
+        "source": "local",
+        "path": "./plugins/image-processing"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

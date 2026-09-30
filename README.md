@@ -1,10 +1,32 @@
-# Image Processing Skill
+# Image Processing Plugin + Skill
 
 **Turn imperfect image assets into reviewable, production-ready work—without losing the details that matter.**
 
-![Version](https://img.shields.io/badge/version-v1.1.0-0B6E75) ![Format](https://img.shields.io/badge/format-Agent%20Skill-2D4059)
+![Version](https://img.shields.io/badge/version-v1.2.0-0B6E75) ![Format](https://img.shields.io/badge/format-Codex%20Plugin%20%2B%20Agent%20Skill-2D4059)
 
-AI-generated images can look convincing at a glance while hiding changed faces, bent structures, duplicated objects, or soft detail. This skill gives an agent a practical way to diagnose those defects, repair only the necessary pixels, and check the result at its real display size. It also covers creating a new image from an approved brief and references.
+AI-generated images can look convincing at a glance while hiding changed faces, bent structures, duplicated objects, or soft detail. This repository now provides a modular Codex plugin for focused image tasks and retains the original standalone skill for existing installations. Neither package includes an image model.
+
+## Choose the entry point
+
+| Use | Location | Responsibility |
+| --- | --- | --- |
+| Inspect or identify a target | [image-inspect](plugins/image-processing/skills/image-inspect/SKILL.md) | Diagnose the source and map ambiguous objects without editing |
+| Create new artwork | [image-create](plugins/image-processing/skills/image-create/SKILL.md) | Generate from a brief and role-limited references |
+| Repair an accepted image | [image-repair](plugins/image-processing/skills/image-repair/SKILL.md) | Produce a local candidate and composite reviewed pixels |
+| Check a candidate | [image-verify](plugins/image-processing/skills/image-verify/SKILL.md) | Review required changes, protected details, and delivery quality without editing |
+
+The [plugin manifest](plugins/image-processing/.codex-plugin/plugin.json) packages these four skills. Its detailed references live inside the plugin, so the package can travel on its own. An agent may use the relevant skills in sequence for a complete job; independent review is optional when the task justifies it. The top-level [SKILL.md](SKILL.md) remains the backward-compatible standalone workflow and is no longer where new specialist instructions accumulate. Choose one installation mode per agent to avoid duplicate routing between the legacy skill and the plugin.
+
+## Install the plugin in Codex
+
+After this release is available on GitHub, register the repository marketplace and install the package:
+
+```bash
+codex plugin marketplace add hbui290/image-processing-skill --ref v1.2.0
+codex plugin add image-processing@image-processing
+```
+
+Start a new Codex chat after installation so its four skills are discovered. The [marketplace entry](.agents/plugins/marketplace.json) points to the self-contained plugin folder. Installing the package does not install an image model, ImageMagick, Real-ESRGAN, or Grounded SAM 2; check the task-specific capabilities in [tool readiness](plugins/image-processing/references/tool-readiness.md). No marketplace or account configuration changes occur merely by cloning this repository.
 
 ## What it helps with
 
@@ -15,15 +37,17 @@ AI-generated images can look convincing at a glance while hiding changed faces, 
 - **Review honestly:** check every requested and protected criterion, stop unproductive repair loops, and distinguish tools actually run from tools merely available.
 - **Move machines safely:** use the readiness guide to check capabilities, source files, model access, and output formats before continuing a job.
 
-## Start here
+## Standalone skill setup
 
-1. Copy this entire repository into your agent's configured skills directory as `image-processing/`, then start a new session and confirm the skill appears in its available-skill list. For a typical Codex POSIX setup, the destination is `${CODEX_HOME:-$HOME/.codex}/skills/image-processing/`.
+1. For the existing standalone mode, copy this repository into your agent's configured skills directory as `image-processing/`, then start a new session and confirm the skill appears in its available-skill list. For a typical Codex POSIX setup, the destination is `${CODEX_HOME:-$HOME/.codex}/skills/image-processing/`.
 2. Read [SKILL.md](SKILL.md). It is the short decision workflow; supporting references are opened only when relevant.
 3. On a new machine or with a new agent, follow [tool readiness and setup](references/tool-readiness.md). Bring the original image, approved references, accepted candidates, and masks for any job you want to continue.
 4. For a local replacement, follow [repair and compositing](references/repair-and-composite.md). Review the uncompressed composite before exporting the delivery format.
 5. For multiple candidates or repair rounds, use the optional [bounded review and handoff](references/review-loop.md) guide. It requires no extra software.
 
 The skill is a workflow, **not** an image model or an installer. One application can cover several capabilities. An assessment needs no editing tool; a deterministic crop or composite needs one; generating missing detail and compositing the accepted result needs two capabilities. Segmentation and super-resolution are optional additions.
+
+The standalone setup above remains available when no plugin marketplace is configured. Do not install both entry points in the same agent unless you intentionally want overlapping skill routing.
 
 ## Tool map
 
@@ -42,9 +66,11 @@ Other conditional options documented in the references: [LaMa](https://github.co
 
 ## Related work
 
-The optional review guide adapts ideas from [Image Loop](https://github.com/codejunkie99/image-loop/blob/main/skills/image-loop/SKILL.md) and [Image Edit Map](https://github.com/codejunkie99/image-loop/blob/main/skills/image-edit-map/SKILL.md) for explicit criteria and addressable objects, plus [Visual Design Kit](https://github.com/newmindsgroup/visual-design-kit/blob/main/plugins/visual-design-studio/library/templates/media-quality-rubric.md) for reject/hold decisions. These are credited research sources, not bundled skills or installation requirements. The final acceptance mask and protected-pixel comparison remain part of this skill's own workflow.
+The plugin's methods draw on [Image Loop](https://github.com/codejunkie99/image-loop/blob/main/skills/image-loop/SKILL.md) for bounded checks, [Image Edit Map](https://github.com/codejunkie99/image-loop/blob/main/skills/image-edit-map/SKILL.md) for addressable objects, [Image Reconstruction](https://github.com/codejunkie99/image-loop/blob/main/skills/image-reconstruction/SKILL.md) for separating source evidence from edit decisions, [Visual Design Kit](https://github.com/newmindsgroup/visual-design-kit/blob/main/plugins/visual-design-studio/library/templates/media-quality-rubric.md) for reject/hold decisions, and [BuilderIO Logo Composite](https://github.com/BuilderIO/agent-native/blob/main/templates/assets/.agents/skills/logo-composite/SKILL.md) for exact brand overlays. These are credited research sources, not bundled dependencies. The final acceptance mask and protected-pixel comparison remain part of this package's workflow.
 
 ## Release
+
+**v1.2.0** — adds a modular Codex plugin package with four focused skills and self-contained references. The v1.1 standalone skill stays available for existing agents. No model, external account, or heavyweight segmentation dependency was added.
 
 **v1.1.0** — adds optional numbered object maps, criterion-by-criterion review, bounded repair rounds, and a portable handoff record without new runtime dependencies. Use the Git tag `v1.1.0` to obtain this exact version.
 
