@@ -11,6 +11,7 @@ Produce an image that is accurate to the user's source and usable at its intende
 
 - Identify the image's job and delivery surface: hero, portrait, product image, thumbnail, illustration, background, print, game art, or another target. Record required dimensions, aspect ratio, format, transparency, file-size budget, and where it will be viewed.
 - Identify the source of truth for each protected element: original image, approved character sheet, product photo, logo/vector, diagram data, or user-supplied reference. Record which items may change and which must remain fixed.
+- For a multi-object or high-stakes edit, give each requested change and protected invariant a short ID with an observable pass condition. Mark file requirements separately from visual requirements. Decide before generation which failures would reject a candidate and which observations are advisory; an unknown required result is not a pass.
 - Keep an untouched source. Save candidates as new files until accepted. Do not silently replace a master or claim that an AI reconstruction is a lossless restoration.
 - For a new image with no source to preserve, define subject, composition, style, and approved references; generate candidates using the selected tool's instructions and judge them against the image contract. Preservation masks apply when editing an existing image.
 - When only an assessment is requested, inspect and report; edit only if the user requests a change.
@@ -38,6 +39,8 @@ Choose the least disruptive operation that solves the observed defect. Use speci
 
 For connected structures or crowded scenes, map supports, openings, overlaps, and repeated object instances before editing. Check structure and proposed masks against source pixels. Do not infer a proprietary editor's internal algorithm from an open-source example.
 
+When a target is ambiguous among repeated objects, make a numbered review copy and a matching plain-language legend so the exact instance can be selected. Keep the clean source as the edit input, retain stable IDs across revisions, and store object locations in source-image coordinates. A rectangle locates an object; it is not an approved mask. Skip the map when the target is already unambiguous.
+
 ## Control generated edits
 
 - Supply the relevant crop and approved references, identifying what each controls. Specify the exact change and protected subjects, count, pose, product markings, typography, perspective, and layout. Composite approved logos or exact text from their source art.
@@ -54,6 +57,8 @@ Read [repair-and-composite.md](references/repair-and-composite.md) when a task n
 3. **Whole composition:** Inspect the final crop at every relevant target size. Confirm focal point, negative space, legibility, and the relationship between image and overlaid content.
 4. **File delivery:** Verify dimensions, orientation, color profile when relevant, transparency, format, decoding, file size, and actual references in the destination. Preserve an editable master when future changes are likely.
 5. **Evidence:** State the source, operations, generated regions, rejected candidates that affected the decision, what was visually checked, and what remains unverified. Separate tools actually run from tools merely installed or proposed, and verbatim prompts from reconstructed examples. Distinguish a local preview from a deployed result. Do not present a successful export or build as proof of visual quality.
+
+For a multi-round edit, read [review-loop.md](references/review-loop.md) before accepting a candidate. Review every required criterion after each repair, including protected content, and record pass, fail, or uncertain with visible evidence. An independent image-capable reviewer can add a second assessment when the stakes justify it; label a self-review honestly. Model review cannot establish exact pixel identity, which requires a deterministic comparison.
 
 When a protected region must remain exact, compare the source and uncompressed composite outside the nonzero final acceptance mask. Investigate every changed pixel there before lossy export; then inspect the exported image visually because compression may change even protected pixels. Check seams both numerically and at 100% view.
 
