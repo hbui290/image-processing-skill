@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Audit a local image edit against a scene contract and a visual review.
 
-The script never generates pixels or decides what an image depicts. White pixels
-in an optional binary acceptance mask permit changes; black pixels lock them.
+The script never generates pixels or decides what an image depicts. Any nonzero
+pixel in an optional acceptance mask permits changes, including a feathered edge;
+pure black pixels lock them.
 """
 
 import argparse
@@ -105,13 +106,17 @@ def validate_review(review, checks):
         raise ValueError("review.results must be a list")
     results = {}
     for item in review["results"]:
-        exact_fields(item, {"id", "status", "evidence"}, set(), "review result")
+        exact_fields(item, {"id", "status", "evidence"}, {"acknowledged_changed_pixels"}, "review result")
         check_id = nonempty(item["id"], "result.id")
         if check_id in results or check_id not in checks:
             raise ValueError(f"{check_id}: duplicate or unknown review ID")
         if item["status"] not in {"pass", "fail", "uncertain"}:
             raise ValueError(f"{check_id}: invalid status")
         nonempty(item["evidence"], f"{check_id}.evidence")
+        if "acknowledged_changed_pixels" in item:
+            count = item["acknowledged_changed_pixels"]
+            if checks[check_id]["kind"] != "keep" or isinstance(count, bool) or not isinstance(count, int) or count < 0:
+                raise ValueError(f"{check_id}: acknowledged_changed_pixels must be a nonnegative integer on a keep check")
         results[check_id] = item
     if results.keys() != checks.keys():
         raise ValueError(f"review is missing IDs: {sorted(checks.keys() - results.keys())}")
@@ -129,12 +134,16 @@ def digest(path):
 def inspect_pixels(source, candidate, mask, targets):
     from PIL import ImageChops
 
-    delta = ImageChops.difference(source.convert("RGBA"), candidate.convert("RGBA"))
+    source, candidate = source.convert("RGBA"), candidate.convert("RGBA")
+    delta = ImageChops.difference(source, candidate)
     channels = delta.split()
     changed = channels[0]
     for channel in channels[1:]:
         changed = ImageChops.lighter(changed, channel)
     changed = changed.point(lambda value: 255 if value else 0)
+    # Hidden RGB under alpha 0 in both images is invisible, so it is not a change.
+    any_alpha = ImageChops.lighter(source.getchannel("A"), candidate.getchannel("A"))
+    changed = ImageChops.darker(changed, any_alpha.point(lambda value: 255 if value else 0))
     counts = {}
     for target_id, (x, y, width, height) in targets.items():
         counts[target_id] = changed.crop((x, y, x + width, y + height)).histogram()[255]
@@ -145,12 +154,28 @@ def inspect_pixels(source, candidate, mask, targets):
             "changed_outside_mask": outside}
 
 
-def decide(checks, results, technical_issues, repairs_used, max_repairs, previous):
+def unacknowledged_keep_changes(checks, results, pixels):
+    """Passed keep checks whose target changed more pixels than the reviewer acknowledged."""
+    if pixels is None:
+        return {}
+    found = {}
+    for check_id, item in checks.items():
+        changed = pixels["changed_by_target"][item["target_id"]]
+        result = results[check_id]
+        if item["kind"] == "keep" and result["status"] == "pass" and changed > result.get("acknowledged_changed_pixels", 0):
+            found[check_id] = changed
+    return found
+
+
+def decide(checks, results, technical_issues, repairs_used, max_repairs, previous, keep_changes=None):
     if technical_issues:
         return {"action": "reject_technical", "issues": technical_issues}
     uncertain = [item["id"] for item in results.values() if item["status"] == "uncertain"]
-    if uncertain:
-        return {"action": "hold_for_inspection", "check_ids": uncertain}
+    if uncertain or keep_changes:
+        decision = {"action": "hold_for_inspection", "check_ids": uncertain + sorted(keep_changes or {})}
+        if keep_changes:
+            decision["changed_keep_pixels"] = keep_changes
+        return decision
     failed = [item["id"] for item in results.values() if item["status"] == "fail"]
     protected = [check_id for check_id in failed if checks[check_id]["kind"] == "keep"]
     if protected:
@@ -203,8 +228,9 @@ def main():
         mask = Image.open(args.mask).convert("L") if args.mask else None
         if mask and mask.size != candidate.size:
             raise ValueError("acceptance mask dimensions differ from the candidate")
-        if mask and any(mask.histogram()[1:255]):
-            raise ValueError("acceptance mask must be binary: black locked, white editable")
+        if mask:
+            # A feathered edge is editable: every nonzero pixel permits change, only pure black locks.
+            mask = mask.point(lambda value: 255 if value else 0)
         issues = []
         canvas = contract["canvas"]
         if candidate.size != (canvas["width"], canvas["height"]):
@@ -228,7 +254,8 @@ def main():
                     "candidate": {"width": candidate.width, "height": candidate.height,
                                   "format": candidate.format}, "pixels": pixels,
                     "technical_issues": issues}
-        decision = decide(checks, results, issues, args.repairs_used, limit, previous)
+        decision = decide(checks, results, issues, args.repairs_used, limit, previous,
+                          unacknowledged_keep_changes(checks, results, pixels))
         args.out.mkdir(parents=True)
         (args.out / "evidence.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
         (args.out / "decision.json").write_text(json.dumps(decision, indent=2) + "\n", encoding="utf-8")
